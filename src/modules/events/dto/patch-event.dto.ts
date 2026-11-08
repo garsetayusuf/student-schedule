@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { localDateTimeSchema } from './create-event.dto.js';
+import { localDateTimeSchema, recurrenceSchema } from './create-event.dto.js';
 
 export const patchEventSchema = z
   .object({
@@ -8,6 +8,7 @@ export const patchEventSchema = z
     start: localDateTimeSchema.optional(),
     end: localDateTimeSchema.optional(),
     timeZone: z.string().min(1).optional(),
+    recurrence: recurrenceSchema.nullable().optional(),
   })
   .strict();
 

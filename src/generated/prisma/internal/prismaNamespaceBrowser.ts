@@ -113,6 +113,7 @@ export const EventScalarFieldEnum = {
   subjectId: 'subjectId',
   title: 'title',
   startLocal: 'startLocal',
+  recurrenceUntil: 'recurrenceUntil',
   endLocal: 'endLocal',
   timeZone: 'timeZone',
   startUtc: 'startUtc',

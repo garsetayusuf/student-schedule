@@ -48,6 +48,7 @@ model Event {
   subjectId  String?  @map("subject_id")
   title      String
   startLocal DateTime @map("start_local") @db.Timestamp(0)
+  recurrenceUntil DateTime? @map("recurrence_until") @db.Date
   endLocal   DateTime @map("end_local") @db.Timestamp(0)
   timeZone   String   @map("time_zone")
   startUtc   DateTime @map("start_utc") @db.Timestamptz(0)

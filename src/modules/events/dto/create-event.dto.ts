@@ -3,6 +3,13 @@ import { z } from 'zod';
 export const localDateTimeSchema = z
   .string()
   .regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/);
+export const calendarDateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+
+export const recurrenceSchema = z
+  .object({
+    weekly: z.object({ until: calendarDateSchema }).strict(),
+  })
+  .strict();
 
 const eventFieldsSchema = z
   .object({
@@ -11,15 +18,14 @@ const eventFieldsSchema = z
     start: localDateTimeSchema,
     end: localDateTimeSchema,
     timeZone: z.string().min(1),
+    recurrence: recurrenceSchema.optional(),
   })
   .strict();
 
 export const createEventSchema = eventFieldsSchema.refine(
   (value) => value.end > value.start,
-  {
-    path: ['end'],
-    message: 'Must be after start',
-  },
+  { path: ['end'], message: 'Must be after start' },
 );
 
 export type CreateEventDto = z.infer<typeof createEventSchema>;
+export type RecurrenceDto = z.infer<typeof recurrenceSchema>;

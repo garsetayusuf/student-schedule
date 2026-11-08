@@ -30,6 +30,7 @@ export type EventMinAggregateOutputType = {
   subjectId: string | null;
   title: string | null;
   startLocal: Date | null;
+  recurrenceUntil: Date | null;
   endLocal: Date | null;
   timeZone: string | null;
   startUtc: Date | null;
@@ -44,6 +45,7 @@ export type EventMaxAggregateOutputType = {
   subjectId: string | null;
   title: string | null;
   startLocal: Date | null;
+  recurrenceUntil: Date | null;
   endLocal: Date | null;
   timeZone: string | null;
   startUtc: Date | null;
@@ -58,6 +60,7 @@ export type EventCountAggregateOutputType = {
   subjectId: number;
   title: number;
   startLocal: number;
+  recurrenceUntil: number;
   endLocal: number;
   timeZone: number;
   startUtc: number;
@@ -73,6 +76,7 @@ export type EventMinAggregateInputType = {
   subjectId?: true;
   title?: true;
   startLocal?: true;
+  recurrenceUntil?: true;
   endLocal?: true;
   timeZone?: true;
   startUtc?: true;
@@ -87,6 +91,7 @@ export type EventMaxAggregateInputType = {
   subjectId?: true;
   title?: true;
   startLocal?: true;
+  recurrenceUntil?: true;
   endLocal?: true;
   timeZone?: true;
   startUtc?: true;
@@ -101,6 +106,7 @@ export type EventCountAggregateInputType = {
   subjectId?: true;
   title?: true;
   startLocal?: true;
+  recurrenceUntil?: true;
   endLocal?: true;
   timeZone?: true;
   startUtc?: true;
@@ -195,6 +201,7 @@ export type EventGroupByOutputType = {
   subjectId: string | null;
   title: string;
   startLocal: Date;
+  recurrenceUntil: Date | null;
   endLocal: Date;
   timeZone: string;
   startUtc: Date;
@@ -228,6 +235,8 @@ export type EventWhereInput = {
   subjectId?: Prisma.StringNullableFilter<'Event'> | string | null;
   title?: Prisma.StringFilter<'Event'> | string;
   startLocal?: Prisma.DateTimeFilter<'Event'> | Date | string;
+  recurrenceUntil?:
+    Prisma.DateTimeNullableFilter<'Event'> | Date | string | null;
   endLocal?: Prisma.DateTimeFilter<'Event'> | Date | string;
   timeZone?: Prisma.StringFilter<'Event'> | string;
   startUtc?: Prisma.DateTimeFilter<'Event'> | Date | string;
@@ -247,6 +256,7 @@ export type EventOrderByWithRelationInput = {
   subjectId?: Prisma.SortOrderInput | Prisma.SortOrder;
   title?: Prisma.SortOrder;
   startLocal?: Prisma.SortOrder;
+  recurrenceUntil?: Prisma.SortOrderInput | Prisma.SortOrder;
   endLocal?: Prisma.SortOrder;
   timeZone?: Prisma.SortOrder;
   startUtc?: Prisma.SortOrder;
@@ -267,6 +277,8 @@ export type EventWhereUniqueInput = Prisma.AtLeast<
     subjectId?: Prisma.StringNullableFilter<'Event'> | string | null;
     title?: Prisma.StringFilter<'Event'> | string;
     startLocal?: Prisma.DateTimeFilter<'Event'> | Date | string;
+    recurrenceUntil?:
+      Prisma.DateTimeNullableFilter<'Event'> | Date | string | null;
     endLocal?: Prisma.DateTimeFilter<'Event'> | Date | string;
     timeZone?: Prisma.StringFilter<'Event'> | string;
     startUtc?: Prisma.DateTimeFilter<'Event'> | Date | string;
@@ -288,6 +300,7 @@ export type EventOrderByWithAggregationInput = {
   subjectId?: Prisma.SortOrderInput | Prisma.SortOrder;
   title?: Prisma.SortOrder;
   startLocal?: Prisma.SortOrder;
+  recurrenceUntil?: Prisma.SortOrderInput | Prisma.SortOrder;
   endLocal?: Prisma.SortOrder;
   timeZone?: Prisma.SortOrder;
   startUtc?: Prisma.SortOrder;
@@ -313,6 +326,8 @@ export type EventScalarWhereWithAggregatesInput = {
     Prisma.StringNullableWithAggregatesFilter<'Event'> | string | null;
   title?: Prisma.StringWithAggregatesFilter<'Event'> | string;
   startLocal?: Prisma.DateTimeWithAggregatesFilter<'Event'> | Date | string;
+  recurrenceUntil?:
+    Prisma.DateTimeNullableWithAggregatesFilter<'Event'> | Date | string | null;
   endLocal?: Prisma.DateTimeWithAggregatesFilter<'Event'> | Date | string;
   timeZone?: Prisma.StringWithAggregatesFilter<'Event'> | string;
   startUtc?: Prisma.DateTimeWithAggregatesFilter<'Event'> | Date | string;
@@ -325,6 +340,7 @@ export type EventCreateInput = {
   id?: string;
   title: string;
   startLocal: Date | string;
+  recurrenceUntil?: Date | string | null;
   endLocal: Date | string;
   timeZone: string;
   startUtc: Date | string;
@@ -341,6 +357,7 @@ export type EventUncheckedCreateInput = {
   subjectId?: string | null;
   title: string;
   startLocal: Date | string;
+  recurrenceUntil?: Date | string | null;
   endLocal: Date | string;
   timeZone: string;
   startUtc: Date | string;
@@ -353,6 +370,8 @@ export type EventUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string;
   title?: Prisma.StringFieldUpdateOperationsInput | string;
   startLocal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+  recurrenceUntil?:
+    Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
   endLocal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   timeZone?: Prisma.StringFieldUpdateOperationsInput | string;
   startUtc?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -369,6 +388,8 @@ export type EventUncheckedUpdateInput = {
   subjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
   title?: Prisma.StringFieldUpdateOperationsInput | string;
   startLocal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+  recurrenceUntil?:
+    Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
   endLocal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   timeZone?: Prisma.StringFieldUpdateOperationsInput | string;
   startUtc?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -383,6 +404,7 @@ export type EventCreateManyInput = {
   subjectId?: string | null;
   title: string;
   startLocal: Date | string;
+  recurrenceUntil?: Date | string | null;
   endLocal: Date | string;
   timeZone: string;
   startUtc: Date | string;
@@ -395,6 +417,8 @@ export type EventUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string;
   title?: Prisma.StringFieldUpdateOperationsInput | string;
   startLocal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+  recurrenceUntil?:
+    Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
   endLocal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   timeZone?: Prisma.StringFieldUpdateOperationsInput | string;
   startUtc?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -409,6 +433,8 @@ export type EventUncheckedUpdateManyInput = {
   subjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
   title?: Prisma.StringFieldUpdateOperationsInput | string;
   startLocal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+  recurrenceUntil?:
+    Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
   endLocal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   timeZone?: Prisma.StringFieldUpdateOperationsInput | string;
   startUtc?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -433,6 +459,7 @@ export type EventCountOrderByAggregateInput = {
   subjectId?: Prisma.SortOrder;
   title?: Prisma.SortOrder;
   startLocal?: Prisma.SortOrder;
+  recurrenceUntil?: Prisma.SortOrder;
   endLocal?: Prisma.SortOrder;
   timeZone?: Prisma.SortOrder;
   startUtc?: Prisma.SortOrder;
@@ -447,6 +474,7 @@ export type EventMaxOrderByAggregateInput = {
   subjectId?: Prisma.SortOrder;
   title?: Prisma.SortOrder;
   startLocal?: Prisma.SortOrder;
+  recurrenceUntil?: Prisma.SortOrder;
   endLocal?: Prisma.SortOrder;
   timeZone?: Prisma.SortOrder;
   startUtc?: Prisma.SortOrder;
@@ -461,6 +489,7 @@ export type EventMinOrderByAggregateInput = {
   subjectId?: Prisma.SortOrder;
   title?: Prisma.SortOrder;
   startLocal?: Prisma.SortOrder;
+  recurrenceUntil?: Prisma.SortOrder;
   endLocal?: Prisma.SortOrder;
   timeZone?: Prisma.SortOrder;
   startUtc?: Prisma.SortOrder;
@@ -641,10 +670,15 @@ export type EventUncheckedUpdateManyWithoutSubjectNestedInput = {
   deleteMany?: Prisma.EventScalarWhereInput | Prisma.EventScalarWhereInput[];
 };
 
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null;
+};
+
 export type EventCreateWithoutUserInput = {
   id?: string;
   title: string;
   startLocal: Date | string;
+  recurrenceUntil?: Date | string | null;
   endLocal: Date | string;
   timeZone: string;
   startUtc: Date | string;
@@ -659,6 +693,7 @@ export type EventUncheckedCreateWithoutUserInput = {
   subjectId?: string | null;
   title: string;
   startLocal: Date | string;
+  recurrenceUntil?: Date | string | null;
   endLocal: Date | string;
   timeZone: string;
   startUtc: Date | string;
@@ -717,6 +752,8 @@ export type EventScalarWhereInput = {
   subjectId?: Prisma.StringNullableFilter<'Event'> | string | null;
   title?: Prisma.StringFilter<'Event'> | string;
   startLocal?: Prisma.DateTimeFilter<'Event'> | Date | string;
+  recurrenceUntil?:
+    Prisma.DateTimeNullableFilter<'Event'> | Date | string | null;
   endLocal?: Prisma.DateTimeFilter<'Event'> | Date | string;
   timeZone?: Prisma.StringFilter<'Event'> | string;
   startUtc?: Prisma.DateTimeFilter<'Event'> | Date | string;
@@ -729,6 +766,7 @@ export type EventCreateWithoutSubjectInput = {
   id?: string;
   title: string;
   startLocal: Date | string;
+  recurrenceUntil?: Date | string | null;
   endLocal: Date | string;
   timeZone: string;
   startUtc: Date | string;
@@ -743,6 +781,7 @@ export type EventUncheckedCreateWithoutSubjectInput = {
   userId: string;
   title: string;
   startLocal: Date | string;
+  recurrenceUntil?: Date | string | null;
   endLocal: Date | string;
   timeZone: string;
   startUtc: Date | string;
@@ -798,6 +837,7 @@ export type EventCreateManyUserInput = {
   subjectId?: string | null;
   title: string;
   startLocal: Date | string;
+  recurrenceUntil?: Date | string | null;
   endLocal: Date | string;
   timeZone: string;
   startUtc: Date | string;
@@ -810,6 +850,8 @@ export type EventUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string;
   title?: Prisma.StringFieldUpdateOperationsInput | string;
   startLocal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+  recurrenceUntil?:
+    Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
   endLocal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   timeZone?: Prisma.StringFieldUpdateOperationsInput | string;
   startUtc?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -824,6 +866,8 @@ export type EventUncheckedUpdateWithoutUserInput = {
   subjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
   title?: Prisma.StringFieldUpdateOperationsInput | string;
   startLocal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+  recurrenceUntil?:
+    Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
   endLocal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   timeZone?: Prisma.StringFieldUpdateOperationsInput | string;
   startUtc?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -837,6 +881,8 @@ export type EventUncheckedUpdateManyWithoutUserInput = {
   subjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
   title?: Prisma.StringFieldUpdateOperationsInput | string;
   startLocal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+  recurrenceUntil?:
+    Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
   endLocal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   timeZone?: Prisma.StringFieldUpdateOperationsInput | string;
   startUtc?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -850,6 +896,7 @@ export type EventCreateManySubjectInput = {
   userId: string;
   title: string;
   startLocal: Date | string;
+  recurrenceUntil?: Date | string | null;
   endLocal: Date | string;
   timeZone: string;
   startUtc: Date | string;
@@ -862,6 +909,8 @@ export type EventUpdateWithoutSubjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string;
   title?: Prisma.StringFieldUpdateOperationsInput | string;
   startLocal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+  recurrenceUntil?:
+    Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
   endLocal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   timeZone?: Prisma.StringFieldUpdateOperationsInput | string;
   startUtc?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -876,6 +925,8 @@ export type EventUncheckedUpdateWithoutSubjectInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string;
   title?: Prisma.StringFieldUpdateOperationsInput | string;
   startLocal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+  recurrenceUntil?:
+    Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
   endLocal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   timeZone?: Prisma.StringFieldUpdateOperationsInput | string;
   startUtc?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -889,6 +940,8 @@ export type EventUncheckedUpdateManyWithoutSubjectInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string;
   title?: Prisma.StringFieldUpdateOperationsInput | string;
   startLocal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+  recurrenceUntil?:
+    Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
   endLocal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   timeZone?: Prisma.StringFieldUpdateOperationsInput | string;
   startUtc?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
@@ -907,6 +960,7 @@ export type EventSelect<
     subjectId?: boolean;
     title?: boolean;
     startLocal?: boolean;
+    recurrenceUntil?: boolean;
     endLocal?: boolean;
     timeZone?: boolean;
     startUtc?: boolean;
@@ -929,6 +983,7 @@ export type EventSelectCreateManyAndReturn<
     subjectId?: boolean;
     title?: boolean;
     startLocal?: boolean;
+    recurrenceUntil?: boolean;
     endLocal?: boolean;
     timeZone?: boolean;
     startUtc?: boolean;
@@ -951,6 +1006,7 @@ export type EventSelectUpdateManyAndReturn<
     subjectId?: boolean;
     title?: boolean;
     startLocal?: boolean;
+    recurrenceUntil?: boolean;
     endLocal?: boolean;
     timeZone?: boolean;
     startUtc?: boolean;
@@ -969,6 +1025,7 @@ export type EventSelectScalar = {
   subjectId?: boolean;
   title?: boolean;
   startLocal?: boolean;
+  recurrenceUntil?: boolean;
   endLocal?: boolean;
   timeZone?: boolean;
   startUtc?: boolean;
@@ -986,6 +1043,7 @@ export type EventOmit<
   | 'subjectId'
   | 'title'
   | 'startLocal'
+  | 'recurrenceUntil'
   | 'endLocal'
   | 'timeZone'
   | 'startUtc'
@@ -1032,6 +1090,7 @@ export type $EventPayload<
       subjectId: string | null;
       title: string;
       startLocal: Date;
+      recurrenceUntil: Date | null;
       endLocal: Date;
       timeZone: string;
       startUtc: Date;
@@ -1656,6 +1715,7 @@ export interface EventFieldRefs {
   readonly subjectId: Prisma.FieldRef<'Event', 'String'>;
   readonly title: Prisma.FieldRef<'Event', 'String'>;
   readonly startLocal: Prisma.FieldRef<'Event', 'DateTime'>;
+  readonly recurrenceUntil: Prisma.FieldRef<'Event', 'DateTime'>;
   readonly endLocal: Prisma.FieldRef<'Event', 'DateTime'>;
   readonly timeZone: Prisma.FieldRef<'Event', 'String'>;
   readonly startUtc: Prisma.FieldRef<'Event', 'DateTime'>;

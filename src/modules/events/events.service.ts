@@ -1,13 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { Temporal } from '@js-temporal/polyfill';
 import { ApiError } from '../../helpers/response/api-error.js';
-import type { EventResponseDto } from './dto/event-response.dto.js';
+import type {
+  EventResponseDto,
+  RecurrenceResponseDto,
+} from './dto/event-response.dto.js';
 import { PrismaService } from '../../shared/prisma/prisma.service.js';
 import {
   createEventSchema,
   type CreateEventDto,
+  type RecurrenceDto,
 } from './dto/create-event.dto.js';
 import type { PatchEventDto } from './dto/patch-event.dto.js';
+import { expandWeeklyOccurrences } from './event-recurrence.js';
 import { localDate, toUtc } from './event-time.js';
 
 @Injectable()
@@ -39,6 +44,25 @@ export class EventsService {
     return result.data;
   }
 
+  private recurrenceUntil(
+    recurrence: RecurrenceDto | null | undefined,
+    start: string,
+  ): Date | null {
+    if (!recurrence) return null;
+    try {
+      const until = Temporal.PlainDate.from(recurrence.weekly.until);
+      const startDate = Temporal.PlainDate.from(start.slice(0, 10));
+      if (Temporal.PlainDate.compare(until, startDate) < 0)
+        throw new Error('before start');
+      return new Date(`${until.toString()}T00:00:00.000Z`);
+    } catch {
+      throw new ApiError('validation_error', 'Validation failed', 422, {
+        recurrence:
+          'until must be a valid date on or after the event start date',
+      });
+    }
+  }
+
   private data(userId: string, value: CreateEventDto) {
     return {
       userId,
@@ -47,30 +71,49 @@ export class EventsService {
       startLocal: localDate(value.start),
       endLocal: localDate(value.end),
       timeZone: value.timeZone,
+      recurrenceUntil: this.recurrenceUntil(value.recurrence, value.start),
       startUtc: toUtc(value.start, value.timeZone),
       endUtc: toUtc(value.end, value.timeZone),
     };
   }
 
-  private response(event: {
-    id: string;
-    title: string;
-    subjectId: string | null;
-    startLocal: Date;
-    endLocal: Date;
-    timeZone: string;
-    startUtc: Date;
-    endUtc: Date;
-  }): EventResponseDto {
+  private response(
+    event: {
+      id: string;
+      title: string;
+      subjectId: string | null;
+      startLocal: Date;
+      endLocal: Date;
+      timeZone: string;
+      recurrenceUntil: Date | null;
+      startUtc: Date;
+      endUtc: Date;
+    },
+    occurrence?: {
+      occurrenceStart: string;
+      occurrenceEnd: string;
+      startUtc: Date;
+      endUtc: Date;
+    },
+  ): EventResponseDto {
+    const recurrence: RecurrenceResponseDto | undefined = event.recurrenceUntil
+      ? { weekly: { until: event.recurrenceUntil.toISOString().slice(0, 10) } }
+      : undefined;
     return {
       id: event.id,
       title: event.title,
       subjectId: event.subjectId,
-      start: event.startLocal.toISOString().slice(0, 16),
-      end: event.endLocal.toISOString().slice(0, 16),
+      start:
+        occurrence?.occurrenceStart ??
+        event.startLocal.toISOString().slice(0, 16),
+      end: occurrence
+        ? occurrence.occurrenceEnd
+        : event.endLocal.toISOString().slice(0, 16),
       timeZone: event.timeZone,
-      startUtc: event.startUtc.toISOString(),
-      endUtc: event.endUtc.toISOString(),
+      ...(recurrence ? { recurrence } : {}),
+      ...(occurrence ? { occurrenceStart: occurrence.occurrenceStart } : {}),
+      startUtc: (occurrence?.startUtc ?? event.startUtc).toISOString(),
+      endUtc: (occurrence?.endUtc ?? event.endUtc).toISOString(),
     };
   }
 
@@ -107,6 +150,16 @@ export class EventsService {
       start: patch.start ?? current.startLocal.toISOString().slice(0, 16),
       end: patch.end ?? current.endLocal.toISOString().slice(0, 16),
       timeZone: patch.timeZone ?? current.timeZone,
+      recurrence:
+        patch.recurrence === undefined
+          ? current.recurrenceUntil
+            ? {
+                weekly: {
+                  until: current.recurrenceUntil.toISOString().slice(0, 10),
+                },
+              }
+            : undefined
+          : (patch.recurrence ?? undefined),
     });
     await this.assertSubject(userId, value.subjectId);
     return this.response(
@@ -146,10 +199,32 @@ export class EventsService {
       .add({ days: 1 })
       .toString();
     const end = toUtc(`${nextDay}T00:00`, timeZone);
+    const rangeStartDate = new Date(`${validFrom}T00:00:00.000Z`);
     const events = await this.prisma.event.findMany({
-      where: { userId, startUtc: { lt: end }, endUtc: { gt: start } },
+      where: {
+        userId,
+        startUtc: { lt: end },
+        OR: [
+          { recurrenceUntil: null, endUtc: { gt: start } },
+          { recurrenceUntil: { gte: rangeStartDate } },
+        ],
+      },
       orderBy: { startUtc: 'asc' },
     });
-    return events.map((event) => this.response(event));
+    const responses = events.flatMap((event) => {
+      if (!event.recurrenceUntil)
+        return event.endUtc > start ? [this.response(event)] : [];
+      return expandWeeklyOccurrences(
+        {
+          ...event,
+          recurrenceUntil: event.recurrenceUntil.toISOString().slice(0, 10),
+        },
+        start,
+        end,
+      ).map((occurrence) => this.response(event, occurrence));
+    });
+    return responses.sort((left, right) =>
+      left.startUtc.localeCompare(right.startUtc),
+    );
   }
 }

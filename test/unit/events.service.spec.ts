@@ -36,6 +36,31 @@ describe('EventsService', () => {
     expect(create).toHaveBeenCalledOnce();
   });
 
+  it('persists a weekly recurrence until the requested local date', async () => {
+    const create = vi.fn().mockResolvedValue({
+      ...event,
+      recurrenceUntil: new Date(`${fixtureDate}T00:00:00.000Z`),
+    });
+    const service = new EventsService({
+      event: { create, findFirst: vi.fn() },
+      subject: { findFirst: vi.fn() },
+    } as never);
+    await service.create('alice', {
+      title: 'Biology',
+      start,
+      end,
+      timeZone: 'Asia/Jakarta',
+      recurrence: { weekly: { until: fixtureDate } },
+    });
+    expect(create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          recurrenceUntil: new Date(`${fixtureDate}T00:00:00.000Z`),
+        }),
+      }),
+    );
+  });
+
   it('hides an event outside the authenticated user scope', async () => {
     const service = new EventsService({
       event: { create: vi.fn(), findFirst: vi.fn().mockResolvedValue(null) },

@@ -1,5 +1,9 @@
 import type { SchemaObject } from '@nestjs/swagger';
 
+export interface RecurrenceResponseDto {
+  weekly: { until: string };
+}
+
 export interface EventResponseDto {
   id: string;
   title: string;
@@ -7,9 +11,25 @@ export interface EventResponseDto {
   start: string;
   end: string;
   timeZone: string;
+  recurrence?: RecurrenceResponseDto;
+  occurrenceStart?: string;
   startUtc: string;
   endUtc: string;
 }
+
+export const recurrenceOpenApiSchema: SchemaObject = {
+  type: 'object',
+  properties: {
+    weekly: {
+      type: 'object',
+      properties: {
+        until: { type: 'string', format: 'date', example: '2026-12-18' },
+      },
+      required: ['until'],
+    },
+  },
+  required: ['weekly'],
+};
 
 export const eventResponseOpenApiSchema: SchemaObject = {
   type: 'object',
@@ -20,6 +40,8 @@ export const eventResponseOpenApiSchema: SchemaObject = {
     start: { type: 'string', example: '2026-11-09T08:00' },
     end: { type: 'string', example: '2026-11-09T09:30' },
     timeZone: { type: 'string', example: 'Asia/Jakarta' },
+    recurrence: recurrenceOpenApiSchema,
+    occurrenceStart: { type: 'string', example: '2026-11-16T08:00' },
     startUtc: { type: 'string', format: 'date-time' },
     endUtc: { type: 'string', format: 'date-time' },
   },

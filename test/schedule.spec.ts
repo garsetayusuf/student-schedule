@@ -1,16 +1,13 @@
 import { createHash } from 'node:crypto';
+import { INestApplication, StandardSchemaValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import {
-  FastifyAdapter,
-  type NestFastifyApplication,
-} from '@nestjs/platform-fastify';
+import { FastifyAdapter } from '@nestjs/platform-fastify';
 import type { FastifyInstance } from 'fastify';
-import { StandardSchemaValidationPipe } from '@nestjs/common';
 import { AppModule } from '../src/app.module.js';
 import { PrismaService } from '../src/shared/prisma/prisma.service.js';
 
 describe('Student Schedule API', () => {
-  let app: NestFastifyApplication;
+  let app: INestApplication;
   let http: FastifyInstance;
   let prisma: PrismaService;
   let aliceId: string;
@@ -24,9 +21,7 @@ describe('Student Schedule API', () => {
     const module = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
-    app = module.createNestApplication<NestFastifyApplication>(
-      new FastifyAdapter(),
-    );
+    app = module.createNestApplication(new FastifyAdapter());
     app.useGlobalPipes(new StandardSchemaValidationPipe());
     await app.init();
     http = app.getHttpAdapter().getInstance();
@@ -236,6 +231,114 @@ describe('Student Schedule API', () => {
     expect(deleted.body).toBe('');
   });
 
+  it('creates and expands an inclusive weekly recurrence across DST', async () => {
+    const created = await http.inject({
+      method: 'POST',
+      url: '/events',
+      headers: bobHeaders,
+      payload: {
+        title: 'Weekly London lecture',
+        start: '2026-03-23T08:00',
+        end: '2026-03-23T09:00',
+        timeZone: 'Europe/London',
+        recurrence: { weekly: { until: '2026-04-06' } },
+      },
+    });
+    expect(created.statusCode).toBe(201);
+    expect(created.json().data.recurrence).toEqual({
+      weekly: { until: '2026-04-06' },
+    });
+
+    const listed = await http.inject({
+      method: 'GET',
+      url: '/events?from=2026-03-23&to=2026-04-06',
+      headers: bobHeaders,
+    });
+    expect(listed.json().data).toEqual([
+      expect.objectContaining({
+        occurrenceStart: '2026-03-23T08:00',
+        startUtc: '2026-03-23T08:00:00.000Z',
+      }),
+      expect.objectContaining({
+        occurrenceStart: '2026-03-30T08:00',
+        startUtc: '2026-03-30T07:00:00.000Z',
+      }),
+      expect.objectContaining({
+        occurrenceStart: '2026-04-06T08:00',
+        startUtc: '2026-04-06T07:00:00.000Z',
+      }),
+    ]);
+  });
+
+  it('updates and deletes a recurring series as one owned resource', async () => {
+    const created = await http.inject({
+      method: 'POST',
+      url: '/events',
+      headers: aliceHeaders,
+      payload: {
+        title: 'Weekly Biology',
+        start: '2026-11-09T08:00',
+        end: '2026-11-09T09:00',
+        timeZone: 'Asia/Jakarta',
+        recurrence: { weekly: { until: '2026-11-23' } },
+      },
+    });
+    const id = created.json().data.id;
+    const patched = await http.inject({
+      method: 'PATCH',
+      url: `/events/${id}`,
+      headers: aliceHeaders,
+      payload: { title: 'Updated Weekly Biology' },
+    });
+    expect(patched.statusCode).toBe(200);
+
+    const listed = await http.inject({
+      method: 'GET',
+      url: '/events?from=2026-11-09&to=2026-11-23',
+      headers: aliceHeaders,
+    });
+    expect(listed.json().data).toEqual([
+      expect.objectContaining({ title: 'Updated Weekly Biology' }),
+      expect.objectContaining({ title: 'Updated Weekly Biology' }),
+      expect.objectContaining({ title: 'Updated Weekly Biology' }),
+    ]);
+
+    const deleted = await http.inject({
+      method: 'DELETE',
+      url: `/events/${id}`,
+      headers: aliceHeaders,
+    });
+    expect(deleted.statusCode).toBe(204);
+  });
+
+  it('rejects invalid recurrence dates and unknown recurrence fields', async () => {
+    const prior = await http.inject({
+      method: 'POST',
+      url: '/events',
+      headers: aliceHeaders,
+      payload: {
+        title: 'Invalid recurrence',
+        start: '2026-11-09T08:00',
+        end: '2026-11-09T09:00',
+        timeZone: 'Asia/Jakarta',
+        recurrence: { weekly: { until: '2026-11-08' } },
+      },
+    });
+    const unknown = await http.inject({
+      method: 'POST',
+      url: '/events',
+      headers: aliceHeaders,
+      payload: {
+        title: 'Unknown recurrence',
+        start: '2026-11-09T08:00',
+        end: '2026-11-09T09:00',
+        timeZone: 'Asia/Jakarta',
+        recurrence: { daily: { until: '2026-11-30' } },
+      },
+    });
+    expect(prior.statusCode).toBe(422);
+    expect(unknown.statusCode).toBe(422);
+  });
   it('returns 422 for an impossible range date', async () => {
     const response = await http.inject({
       method: 'GET',
