@@ -48,13 +48,13 @@ describe('response and request logging', () => {
     const request = { method: 'GET', url: '/healthz', headers: {} };
     const reply = { statusCode: 200, header: vi.fn() };
     middleware.onRequest(request as never, reply as never, vi.fn());
-    middleware.onResponse(request as never, reply as never, vi.fn());
+    middleware.onSend(request as never, reply as never, '{"data":{}}', vi.fn());
     expect(reply.header).toHaveBeenCalledWith(
       'x-request-id',
       expect.any(String),
     );
     expect(logger).toHaveBeenCalledWith(
-      expect.stringContaining('http.request.completed'),
+      expect.stringContaining('http.response.completed'),
     );
     logger.mockRestore();
   });

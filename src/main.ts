@@ -23,6 +23,8 @@ async function bootstrap(): Promise<void> {
   const httpLogger = app.get(HttpLoggerMiddleware);
   const fastify = app.getHttpAdapter().getInstance();
   fastify.addHook('onRequest', httpLogger.onRequest.bind(httpLogger));
+  fastify.addHook('preHandler', httpLogger.preHandler.bind(httpLogger));
+  fastify.addHook('onSend', httpLogger.onSend.bind(httpLogger));
   fastify.addHook('onResponse', httpLogger.onResponse.bind(httpLogger));
   const config = app.get(ConfigService<AppConfig, true>);
   setupSwagger(app);
