@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
-import { js_beautify } from 'js-beautify';
 import { JsonTruncator } from 'json-truncator';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { CustomLogger } from '../helpers/custom-logger.js';
@@ -83,10 +82,7 @@ export class HttpLoggerMiddleware {
       }
     }
     const safePayload = redactSensitiveData(parsedPayload);
-    const body =
-      process.env.LOG_LEVEL === 'debug'
-        ? js_beautify(JSON.stringify(safePayload))
-        : JsonTruncator.truncate(safePayload, 5);
+    const body = JsonTruncator.truncate(safePayload, 5);
     this.logger.logResponse({
       event: 'http.response.completed',
       requestId: requestWithId.requestId,
