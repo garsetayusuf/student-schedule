@@ -18,7 +18,7 @@ pnpm prisma generate && pnpm prisma migrate deploy && pnpm db:seed
 pnpm start:dev
 ```
 
-The API listens on `http://localhost:3000`. Scalar documentation is available at `/api-docs`. The seeded test tokens are `token-alice` and `token-bob`.
+The API listens on `http://localhost:3000`. Interactive Scalar/OpenAPI documentation is available at `http://localhost:3000/api-docs`. The seeded test tokens are `token-alice` and `token-bob`.
 
 For the simplest setup, use Docker Compose instead:
 
@@ -37,22 +37,6 @@ npm test
 ```
 
 The suite covers authentication, user isolation for GET/PATCH/DELETE, invalid event ordering and calendar dates, weekly recurrence, London daylight-saving conversion, the database health endpoint, DTO/service edge cases, response envelopes, and request logging.
-
-## Recurrence
-
-Events may include an inclusive weekly recurrence:
-
-```json
-{
-  "recurrence": {
-    "weekly": {
-      "until": "2026-12-18"
-    }
-  }
-}
-```
-
-`GET /events` expands occurrences with `occurrenceStart` while preserving the event's local wall-clock time across DST. PATCH and DELETE operate on the complete series. Occurrence-level overrides are not implemented.
 
 ## Request IDs and logs
 
