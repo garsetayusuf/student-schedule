@@ -54,7 +54,7 @@ describe('response and request logging', () => {
       expect.any(String),
     );
     expect(logger).toHaveBeenCalledWith(
-      expect.stringContaining('http.response.completed'),
+      expect.stringContaining('"event":"response"'),
     );
     logger.mockRestore();
   });

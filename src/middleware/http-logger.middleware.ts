@@ -63,7 +63,7 @@ export class HttpLoggerMiddleware {
   ): void {
     const requestWithId = request as RequestWithId;
     this.logRequest({
-      event: 'http.request.started',
+      event: 'request',
       requestId: requestWithId.requestId,
       method: request.method,
       path: request.url,
@@ -89,7 +89,7 @@ export class HttpLoggerMiddleware {
       }
     }
     this.logResponse({
-      event: 'http.response.completed',
+      event: 'response',
       requestId: requestWithId.requestId,
       method: request.method,
       path: request.url,
