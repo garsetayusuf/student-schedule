@@ -2,7 +2,7 @@
 
 ## 1. Data model
 
-Prisma models are `User`, `ApiToken`, `Subject`, and `Event`. A subject belongs to one user. An event belongs to one user and may reference one of that user's subjects. Every service query includes the authenticated `userId`, so another user's record returns `404` rather than revealing that it exists. Events store `startLocal` and `endLocal` as PostgreSQL `timestamp without time zone`, plus an IANA `timeZone`. `startUtc` and `endUtc` are calculated `timestamptz` values used for ordering and range queries. This preserves an 08:00 local class across DST changes. For recurrence, add an event-series record and per-occurrence overrides; editing one occurrence creates an override, while editing future occurrences splits the series.
+Prisma models are `User`, `ApiToken`, `Subject`, and `Event`. A subject belongs to one user. An event belongs to one user and may reference one of that user's subjects. Every service query includes the authenticated `userId`, so another user's record returns `404` rather than revealing that it exists. Events store `startLocal` and `endLocal` as PostgreSQL `timestamp without time zone`, plus an IANA `timeZone`; `startUtc` and `endUtc` are derived `timestamptz` values. A recurring event remains one series-template row with nullable `recurrenceUntil` (`DATE`). `GET /events` expands weekly occurrences in memory through the inclusive until date, recalculating UTC for each local date. PATCH and DELETE affect the whole series; occurrence overrides remain future work.
 
 ## 2. Subscriptions
 
