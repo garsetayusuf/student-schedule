@@ -8,12 +8,14 @@ Small NestJS API for subjects and time-zone-aware class events.
 - pnpm 12.18.0 installed. If Corepack is available, `corepack prepare pnpm@12.18.0 --activate` also works.
 - Docker Compose for the zero-manual-setup path, or PostgreSQL 16 locally.
 
-## Run from scratch
+## Run from scratch manually
 
 ```bash
 pnpm install --frozen-lockfile
 cp .env.example .env
-pnpm prisma generate && pnpm prisma migrate deploy && pnpm db:seed
+pnpm prisma generate
+pnpm prisma migrate deploy
+pnpm db:seed
 pnpm start:dev
 ```
 
@@ -45,12 +47,32 @@ Every response includes `x-request-id`. If the client sends one, it is preserved
 
 `.github/workflows/ci.yml` starts PostgreSQL, applies migrations, seeds users, builds, lints, and runs `npm test`.
 
-## Scope and assumptions
+## Assumptions
 
-- Authentication is intentionally fixed bearer tokens, as required by the test. No login or registration flow is included.
+- Authentication uses the seeded fixed bearer tokens required by the test.
+- No login or registration flow is included.
+- PostgreSQL is the source of truth.
 - Event local wall-clock values are stored separately from their derived UTC instants.
 - No real customer data, credentials, or production secrets are included.
 
-## AI tools used
+## What I Would Build Next
 
-AI assistance was used for requirement analysis, architecture comparison against local reference conventions, implementation planning, and code review. Official NestJS and Prisma documentation were used to verify framework APIs.
+- Parent schedule access with explicit student approval and revocation.
+- A durable premium entitlement pipeline for Stripe and RevenueCat webhooks.
+- Rate limiting, metrics, database backups, and production alerting.
+
+## Repository
+
+https://github.com/garsetayusuf/student-schedule.git
+
+## Live API
+
+https://student-schedule.seri.my.id
+
+## API Documentation
+
+https://student-schedule.seri.my.id/api-docs
+
+## AI Tools Used
+
+Oh My Pi was used for requirement analysis, architecture planning, implementation review, test coverage planning, and documentation drafting. Official NestJS and Prisma documentation were used to verify framework and ORM APIs.
