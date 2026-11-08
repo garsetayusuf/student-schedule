@@ -191,6 +191,80 @@ describe('Student Schedule API', () => {
     expect(invalid.json().error.code).toBe('validation_error');
   });
 
+  it('keeps subjects and subject references user-scoped', async () => {
+    const subject = await http.inject({
+      method: 'POST',
+      url: '/subjects',
+      headers: aliceHeaders,
+      payload: { name: 'Alice Only', color: '#123456' },
+    });
+    const subjectId = subject.json().data.id;
+    const bobSubjects = await http.inject({
+      method: 'GET',
+      url: '/subjects',
+      headers: bobHeaders,
+    });
+    expect(
+      bobSubjects
+        .json()
+        .data.some((item: { id: string }) => item.id === subjectId),
+    ).toBe(false);
+
+    const foreignEvent = await http.inject({
+      method: 'POST',
+      url: '/events',
+      headers: bobHeaders,
+      payload: {
+        title: 'Foreign subject',
+        subjectId,
+        start: '2026-11-09T08:00',
+        end: '2026-11-09T09:00',
+        timeZone: 'Europe/London',
+      },
+    });
+    expect(foreignEvent.statusCode).toBe(422);
+    expect(foreignEvent.json().error.code).toBe('validation_error');
+  });
+
+  it('returns only overlapping events in start order', async () => {
+    for (const payload of [
+      { title: 'Late', start: '2026-11-09T10:00', end: '2026-11-09T11:00' },
+      { title: 'Early', start: '2026-11-09T08:00', end: '2026-11-09T09:00' },
+      { title: 'Outside', start: '2026-11-10T08:00', end: '2026-11-10T09:00' },
+    ]) {
+      await http.inject({
+        method: 'POST',
+        url: '/events',
+        headers: aliceHeaders,
+        payload: { ...payload, timeZone: 'Asia/Jakarta' },
+      });
+    }
+    const listed = await http.inject({
+      method: 'GET',
+      url: '/events?from=2026-11-09&to=2026-11-09',
+      headers: aliceHeaders,
+    });
+    expect(
+      listed.json().data.map((event: { title: string }) => event.title),
+    ).toEqual(['Early', 'Late']);
+  });
+
+  it('rejects an unknown time zone at the HTTP boundary', async () => {
+    const response = await http.inject({
+      method: 'POST',
+      url: '/events',
+      headers: aliceHeaders,
+      payload: {
+        title: 'Unknown zone',
+        start: '2026-11-09T08:00',
+        end: '2026-11-09T09:00',
+        timeZone: 'Mars/Phobos',
+      },
+    });
+    expect(response.statusCode).toBe(422);
+    expect(response.json().error.code).toBe('validation_error');
+  });
+
   it('gets, patches, lists, and deletes an owned event', async () => {
     const created = await http.inject({
       method: 'POST',

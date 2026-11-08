@@ -20,6 +20,27 @@ describe('AuthGuard', () => {
     await expect(guard.canActivate(context())).rejects.toBeInstanceOf(ApiError);
   });
 
+  it('rejects a non-bearer authorization scheme', async () => {
+    const guard = new AuthGuard(
+      { getAllAndOverride: vi.fn().mockReturnValue(false) } as never,
+      { apiToken: { findUnique: vi.fn() } } as never,
+    );
+    await expect(
+      guard.canActivate(context('Basic token-alice')),
+    ).rejects.toMatchObject({
+      code: 'unauthorized',
+      status: 401,
+    });
+  });
+
+  it('allows a public route without authentication', async () => {
+    const guard = new AuthGuard(
+      { getAllAndOverride: vi.fn().mockReturnValue(true) } as never,
+      { apiToken: { findUnique: vi.fn() } } as never,
+    );
+    await expect(guard.canActivate(context())).resolves.toBe(true);
+  });
+
   it('attaches the user for a valid token', async () => {
     const findUnique = vi
       .fn()
