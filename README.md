@@ -20,7 +20,7 @@ Start PostgreSQL with the values in `.env`, then run:
 npm test
 ```
 
-The suite covers authentication, user isolation for GET/PATCH/DELETE, invalid event ordering, London daylight-saving conversion, and the database health endpoint.
+The suite covers authentication, user isolation for GET/PATCH/DELETE, invalid event ordering, London daylight-saving conversion, the database health endpoint, DTO/service edge cases, response envelopes, and request logging.
 
 ## Docker
 
@@ -29,6 +29,14 @@ docker compose up --build
 ```
 
 Compose starts PostgreSQL, applies Prisma migrations, seeds the two test users, and starts the non-root API image.
+
+## Request IDs and logs
+
+Every response includes `x-request-id`. If the client sends one, it is preserved; otherwise the API generates one. Completed requests emit structured JSON logs containing the request ID, method, path, status, and duration.
+
+## CI
+
+`.github/workflows/ci.yml` starts PostgreSQL, applies migrations, seeds users, builds, lints, and runs `npm test`.
 
 ## Scope and assumptions
 
