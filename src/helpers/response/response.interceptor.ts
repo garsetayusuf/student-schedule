@@ -6,10 +6,7 @@ import {
 } from '@nestjs/common';
 import { Observable, map } from 'rxjs';
 import type { FastifyRequest } from 'fastify';
-
-interface ResponseWithData {
-  data: unknown;
-}
+import type { ApiSuccessResponse } from '../dto/base-response.dto.js';
 
 @Injectable()
 export class ResponseInterceptor implements NestInterceptor {
@@ -26,7 +23,7 @@ export class ResponseInterceptor implements NestInterceptor {
           !Array.isArray(value) &&
           'data' in value
         ) {
-          return value as ResponseWithData;
+          return value as ApiSuccessResponse<unknown>;
         }
         return { data: value ?? null };
       }),

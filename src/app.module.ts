@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { TerminusModule } from '@nestjs/terminus';
-import { HttpExceptionFilter } from './helpers/response/http-exception.filter.js';
+import { HttpExceptionFilter } from './interceptors/http-exception.filter.js';
 import { ResponseInterceptor } from './helpers/response/response.interceptor.js';
 import { HttpLoggerMiddleware } from './middleware/http-logger.middleware.js';
 import { envSchema } from './config/env.schema.js';

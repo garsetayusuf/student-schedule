@@ -5,7 +5,8 @@ import {
   HttpException,
 } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
-import { ApiError } from './api-error.js';
+import { ApiError } from '../helpers/response/api-error.js';
+import type { ApiErrorResponse } from '../helpers/dto/base-response.dto.js';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -15,9 +16,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const { httpAdapter } = this.adapterHost;
     const context = host.switchToHttp();
     let status = 500;
-    let body: {
-      error: { code: string; message: string; fields?: Record<string, string> };
-    } = {
+    let body: ApiErrorResponse = {
       error: { code: 'internal_error', message: 'Internal server error' },
     };
 

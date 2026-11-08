@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { HttpExceptionFilter } from '../../src/helpers/response/http-exception.filter.js';
+import { HttpExceptionFilter } from '../../src/interceptors/http-exception.filter.js';
 import { ApiError } from '../../src/helpers/response/api-error.js';
 
 describe('HttpExceptionFilter', () => {
