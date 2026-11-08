@@ -21,5 +21,5 @@ COPY --from=production-dependencies /app/node_modules ./node_modules
 COPY --from=base /app/dist ./dist
 COPY package.json ./
 USER app
-EXPOSE 3000
+EXPOSE 8343
 CMD ["node", "dist/main.js"]

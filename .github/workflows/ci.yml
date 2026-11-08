@@ -24,7 +24,7 @@ jobs:
 
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/student_schedule?schema=public
-      PORT: 3000
+      PORT: 8343
       LOG_LEVEL: warn
 
     steps:

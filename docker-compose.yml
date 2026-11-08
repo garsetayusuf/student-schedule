@@ -30,17 +30,17 @@ services:
       context: .
       target: api
     environment:
-      PORT: 3000
+      PORT: 8343
       DATABASE_URL: postgresql://postgres:postgres@db:5432/student_schedule?schema=public
       LOG_LEVEL: log
     ports:
-      - '3000:3000'
+      - '8343:8343'
     depends_on:
       migrate:
         condition: service_completed_successfully
     healthcheck:
       test:
-        ['CMD', 'wget', '--spider', '--quiet', 'http://127.0.0.1:3000/healthz']
+        ['CMD', 'wget', '--spider', '--quiet', 'http://127.0.0.1:8343/healthz']
       interval: 5s
       timeout: 3s
       retries: 10

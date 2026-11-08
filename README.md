@@ -19,7 +19,7 @@ pnpm db:seed
 pnpm start:dev
 ```
 
-The API listens on `http://localhost:3000`. Interactive Scalar/OpenAPI documentation is available at `http://localhost:3000/api-docs`. The seeded test tokens are `token-alice` and `token-bob`.
+The API listens on `http://localhost:8343`. Interactive Scalar/OpenAPI documentation is available at `http://localhost:8343/api-docs`. The seeded test tokens are `token-alice` and `token-bob`.
 
 For the simplest setup, use Docker Compose instead:
 
