@@ -5,14 +5,13 @@ Small NestJS API for subjects and time-zone-aware class events.
 ## Prerequisites
 
 - Node.js 24 or newer.
-- pnpm 12.18.0 through Corepack.
+- pnpm 12.18.0 installed. If Corepack is available, `corepack prepare pnpm@12.18.0 --activate` also works.
 - Docker Compose for the zero-manual-setup path, or PostgreSQL 16 locally.
 
 ## Run from scratch
 
 ```bash
-corepack enable
-pnpm install
+pnpm install --frozen-lockfile
 cp .env.example .env
 pnpm prisma generate && pnpm prisma migrate deploy && pnpm db:seed
 pnpm start:dev
