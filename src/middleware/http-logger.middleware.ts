@@ -1,8 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import { JsonTruncator } from 'json-truncator';
 import type { FastifyReply, FastifyRequest } from 'fastify';
-import { CustomLogger } from '../helpers/custom-logger.js';
 import type { RequestWithId } from '../helpers/response/response.interceptor.js';
 
 const REDACTED_VALUE = '[REDACTED]';
@@ -33,7 +32,15 @@ function redactSensitiveData(value: unknown): unknown {
 
 @Injectable()
 export class HttpLoggerMiddleware {
-  private readonly logger = new CustomLogger(HttpLoggerMiddleware.name);
+  private readonly logger = new Logger(HttpLoggerMiddleware.name);
+
+  private logRequest(payload: Record<string, unknown>): void {
+    this.logger.log(JSON.stringify(payload));
+  }
+
+  private logResponse(payload: Record<string, unknown>): void {
+    this.logger.log(JSON.stringify(payload));
+  }
 
   onRequest(
     request: FastifyRequest,
@@ -55,7 +62,7 @@ export class HttpLoggerMiddleware {
     done: () => void,
   ): void {
     const requestWithId = request as RequestWithId;
-    this.logger.logRequest({
+    this.logRequest({
       event: 'http.request.started',
       requestId: requestWithId.requestId,
       method: request.method,
@@ -81,16 +88,14 @@ export class HttpLoggerMiddleware {
         parsedPayload = payload;
       }
     }
-    const safePayload = redactSensitiveData(parsedPayload);
-    const body = JsonTruncator.truncate(safePayload, 5);
-    this.logger.logResponse({
+    this.logResponse({
       event: 'http.response.completed',
       requestId: requestWithId.requestId,
       method: request.method,
       path: request.url,
       statusCode: reply.statusCode,
       durationMs: Date.now() - (requestWithId.startedAt ?? Date.now()),
-      body,
+      body: JsonTruncator.truncate(redactSensitiveData(parsedPayload), 5),
     });
     done();
   }
