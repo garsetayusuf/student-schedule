@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  timeZone  String
+  createdAt DateTime  @default(now()) @map("created_at")
+  apiToken  ApiToken?
+  subjects  Subject[]
+  events    Event[]
+
+  @@map("users")
+}
+
+model ApiToken {
+  id        String   @id @default(uuid())
+  tokenHash String   @unique @map("token_hash")
+  userId    String   @unique @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("api_tokens")
+}
+
+model Subject {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  name      String
+  color     String?
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  events    Event[]
+
+  @@index([userId])
+  @@map("subjects")
+}
+
+model Event {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  subjectId  String?  @map("subject_id")
+  title      String
+  startLocal DateTime @map("start_local") @db.Timestamp(0)
+  endLocal   DateTime @map("end_local") @db.Timestamp(0)
+  timeZone   String   @map("time_zone")
+  startUtc   DateTime @map("start_utc") @db.Timestamptz(0)
+  endUtc     DateTime @map("end_utc") @db.Timestamptz(0)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject    Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+
+  @@index([userId, startUtc])
+  @@map("events")
+}

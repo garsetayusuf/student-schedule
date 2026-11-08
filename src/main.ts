@@ -1,0 +1,30 @@
+import { StandardSchemaValidationPipe } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
+import { ConfigService } from '@nestjs/config';
+import {
+  FastifyAdapter,
+  NestFastifyApplication,
+} from '@nestjs/platform-fastify';
+import { AppModule } from './app.module.js';
+import type { AppConfig } from './config/env.schema.js';
+import { setupSwagger } from './config/swagger.config.js';
+
+async function bootstrap(): Promise<void> {
+  const app = await NestFactory.create<NestFastifyApplication>(
+    AppModule,
+    new FastifyAdapter(),
+  );
+  app.useGlobalPipes(new StandardSchemaValidationPipe());
+  app.enableCors({
+    origin: true,
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+  });
+  const config = app.get(ConfigService<AppConfig, true>);
+  setupSwagger(app);
+  await app.listen({
+    host: '0.0.0.0',
+    port: config.getOrThrow('PORT', { infer: true }),
+  });
+}
+
+await bootstrap();
