@@ -94,20 +94,4 @@ export class HttpLoggerMiddleware {
     });
     done();
   }
-
-  onResponse(
-    request: FastifyRequest,
-    reply: FastifyReply,
-    done: () => void,
-  ): void {
-    const requestWithId = request as RequestWithId;
-    this.logger.logResponse({
-      event: 'http.response.sent',
-      requestId: requestWithId.requestId,
-      method: request.method,
-      path: request.url,
-      statusCode: reply.statusCode,
-    });
-    done();
-  }
 }
