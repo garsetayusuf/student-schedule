@@ -123,14 +123,28 @@ export class EventsService {
     await this.prisma.event.delete({ where: { id: event.id } });
   }
 
+  private rangeDate(value: string): string {
+    try {
+      return Temporal.PlainDate.from(value).toString();
+    } catch {
+      throw new ApiError('validation_error', 'Validation failed', 422, {
+        date: 'Invalid calendar date',
+      });
+    }
+  }
+
   async list(
     userId: string,
     from: string,
     to: string,
     timeZone: string,
   ): Promise<EventResponseDto[]> {
-    const start = toUtc(`${from}T00:00`, timeZone);
-    const nextDay = Temporal.PlainDate.from(to).add({ days: 1 }).toString();
+    const validFrom = this.rangeDate(from);
+    const validTo = this.rangeDate(to);
+    const start = toUtc(`${validFrom}T00:00`, timeZone);
+    const nextDay = Temporal.PlainDate.from(validTo)
+      .add({ days: 1 })
+      .toString();
     const end = toUtc(`${nextDay}T00:00`, timeZone);
     const events = await this.prisma.event.findMany({
       where: { userId, startUtc: { lt: end }, endUtc: { gt: start } },

@@ -236,6 +236,16 @@ describe('Student Schedule API', () => {
     expect(deleted.body).toBe('');
   });
 
+  it('returns 422 for an impossible range date', async () => {
+    const response = await http.inject({
+      method: 'GET',
+      url: '/events?from=2026-02-01&to=2026-02-30',
+      headers: aliceHeaders,
+    });
+    expect(response.statusCode).toBe(422);
+    expect(response.json().error.code).toBe('validation_error');
+  });
+
   it('returns a public database health result in the required envelope', async () => {
     const response = await http.inject({ method: 'GET', url: '/healthz' });
     expect(response.statusCode).toBe(200);

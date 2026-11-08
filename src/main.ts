@@ -1,4 +1,5 @@
-import { StandardSchemaValidationPipe } from '@nestjs/common';
+import 'dotenv/config';
+import { StandardSchemaValidationPipe, type LogLevel } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import {
@@ -11,9 +12,13 @@ import { setupSwagger } from './config/swagger.config.js';
 import { HttpLoggerMiddleware } from './middleware/http-logger.middleware.js';
 
 async function bootstrap(): Promise<void> {
+  const logger = process.env.LOG_LEVEL
+    ? [process.env.LOG_LEVEL as LogLevel]
+    : undefined;
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     new FastifyAdapter(),
+    { logger },
   );
   app.useGlobalPipes(new StandardSchemaValidationPipe());
   app.enableCors({

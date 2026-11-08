@@ -1,16 +1,22 @@
 import { describe, expect, it, vi } from 'vitest';
-import { EventsService } from '../../src/modules/events/events.service.js';
 import { ApiError } from '../../src/helpers/response/api-error.js';
+import { EventsService } from '../../src/modules/events/events.service.js';
+
+const fixtureDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+  .toISOString()
+  .slice(0, 10);
+const start = `${fixtureDate}T08:00`;
+const end = `${fixtureDate}T09:00`;
 
 const event = {
   id: 'event-1',
   title: 'Biology',
   subjectId: null,
-  startLocal: new Date('2026-11-09T08:00:00.000Z'),
-  endLocal: new Date('2026-11-09T09:00:00.000Z'),
+  startLocal: new Date(`${fixtureDate}T08:00:00.000Z`),
+  endLocal: new Date(`${fixtureDate}T09:00:00.000Z`),
   timeZone: 'Asia/Jakarta',
-  startUtc: new Date('2026-11-09T01:00:00.000Z'),
-  endUtc: new Date('2026-11-09T02:00:00.000Z'),
+  startUtc: new Date(`${fixtureDate}T01:00:00.000Z`),
+  endUtc: new Date(`${fixtureDate}T02:00:00.000Z`),
 };
 
 describe('EventsService', () => {
@@ -22,11 +28,11 @@ describe('EventsService', () => {
     } as never);
     const result = await service.create('alice', {
       title: 'Biology',
-      start: '2026-11-09T08:00',
-      end: '2026-11-09T09:00',
+      start,
+      end,
       timeZone: 'Asia/Jakarta',
     });
-    expect(result).toMatchObject({ id: 'event-1', start: '2026-11-09T08:00' });
+    expect(result).toMatchObject({ id: 'event-1', start });
     expect(create).toHaveBeenCalledOnce();
   });
 
@@ -51,7 +57,10 @@ describe('EventsService', () => {
       subject: { findFirst: vi.fn() },
     } as never);
     await expect(
-      service.update('alice', 'event-1', { end: '2026-11-09T07:00' }),
-    ).rejects.toMatchObject({ code: 'validation_error', status: 422 });
+      service.update('alice', 'event-1', { end: start }),
+    ).rejects.toMatchObject({
+      code: 'validation_error',
+      status: 422,
+    });
   });
 });
